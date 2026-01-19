@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS SLOT</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#000;color:#fff}
+.page{display:none;padding:16px}
+.page.active{display:block}
+
+.header{
+  background:#000;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+input,select{
+  width:100%;
+  padding:14px;
+  border-radius:6px;
+  border:none;
+  margin-bottom:10px;
+}
+
+.btn{
+  padding:14px;
+  border:none;
+  border-radius:25px;
+  background:linear-gradient(#555,#111);
+  color:#fff;
+  width:100%;
+  margin-top:10px;
+}
+
+.home-top{
+  background:linear-gradient(#5b0000,#2b0000);
+  padding:16px;
+  border-radius:10px;
+}
+.balance{margin-top:8px;font-size:18px}
+
+.banner{
+  background:#7b0000;
+  padding:16px;
+  border-radius:12px;
+  text-align:center;
+  margin:12px 0;
+}
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  background:#0b0b0b;
+  border-top:1px solid #333;
+  display:none;
+  justify-content:space-around;
+  padding:8px 0;
+}
+.bottom-nav.show{display:flex}
+.bottom-nav button{
+  background:none;border:none;color:#fff;
+  font-size:12px;
+  display:flex;flex-direction:column;align-items:center
+}
+.bottom-nav span{font-size:18px}
+
+#home,#profil,#deposit{padding-bottom:90px}
+.jackpot-box{
+  background:linear-gradient(180deg,#0b1a4a,#000);
+  border:2px solid #f5c16c;
+  border-radius:12px;
+  padding:14px;
+  text-align:center;
+  margin:14px 0;
+  box-shadow:0 0 12px rgba(255,200,100,.6);
+}
+
+.jackpot-title{
+  font-weight:bold;
+  letter-spacing:1px;
+  margin-bottom:6px;
+}
+
+.jackpot-amount{
+  font-size:22px;
+  font-weight:bold;
+  color:#00e5ff;
+  font-family:"Courier New", monospace;
+}
+
+/* PREMIUM CARD PROFIL */
+.profile-card{
+  background:linear-gradient(135deg,#1b1b1b,#000);
+  border:1px solid #f5c16c;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:0 0 20px rgba(245,193,108,.4);
+}
+
+.profile-card .pc-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.profile-card .pc-header strong{
+  font-size:18px;
+  letter-spacing:1px;
+  color:#f5c16c;
+}
+
+.profile-card .badge{
+  background:linear-gradient(#f5c16c,#c9993a);
+  color:#000;
+  padding:4px 10px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.profile-card .pc-item{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px dashed #333;
+  font-size:14px;
+}
+
+.profile-card .pc-item:last-child{
+  border-bottom:none;
+}
+
+.profile-card span{
+  color:#aaa;
+}
+
+.profile-card b{
+  color:#fff;
+}
+/* MENU KATEGORI HOME */
+.menu-kategori{
+  margin-top:8px;           /* RAPAT ke jackpot */
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+
+.menu-item{
+  background:#0e7a2d;
+  border-radius:8px;
+  padding:14px 6px;
+  text-align:center;
+  font-size:13px;
+  font-weight:bold;
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.3);
+}
+
+.menu-item span{
+  display:block;
+  font-size:20px;
+  margin-bottom:6px;
+}
+/* ANIMASI MENU KATEGORI */
+.menu-item{
+  cursor:pointer;
+  transition:all .25s ease;
+  position:relative;
+  overflow:hidden;
+}
+
+/* efek hover */
+.menu-item:hover{
+  transform:translateY(-3px) scale(1.03);
+  box-shadow:0 0 12px rgba(0,255,120,.8);
+}
+
+/* efek klik / aktif */
+.menu-item.active{
+  background:linear-gradient(135deg,#00ff88,#0e7a2d);
+  box-shadow:0 0 18px rgba(0,255,150,1);
+  animation:pulse 1.2s infinite;
+}
+
+/* animasi denyut */
+@keyframes pulse{
+  0%{box-shadow:0 0 10px rgba(0,255,150,.6)}
+  50%{box-shadow:0 0 22px rgba(0,255,150,1)}
+  100%{box-shadow:0 0 10px rgba(0,255,150,.6)}
+}
+
+/* kilau berjalan */
+.menu-item::after{
+  content:"";
+  position:absolute;
+  top:0;left:-100%;
+  width:100%;
+  height:100%;
+  background:linear-gradient(120deg,
+    transparent,
+    rgba(255,255,255,.35),
+    transparent
+  );
+  transition:.6s;
+}
+.menu-item:hover::after{
+  left:100%;
+}
+
+/* PROMO BANNER BAWAH MENU */
+.promo-img{
+  margin-top: 8px; /* rapat ke menu */
+  text-align:center;
+}
+
+.promo-img img{
+  width:100%;
+  max-width:100%;
+  border-radius:8px;
+}
+/* OVERLAY JACKPOT */
+#jackpotOverlay{
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.85);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+
+.jackpot-popup{
+  background:linear-gradient(135deg,#ffcc00,#ff8800);
+  color:#000;
+  padding:30px 20px;
+  border-radius:18px;
+  text-align:center;
+  width:90%;
+  max-width:360px;
+  box-shadow:0 0 30px gold;
+  animation:zoomIn .6s ease;
+}
+
+.jackpot-popup h2{
+  font-size:22px;
+  margin-bottom:10px;
+}
+
+.jackpot-popup p{
+  font-size:16px;
+  font-weight:bold;
+}
+
+@keyframes zoomIn{
+  from{transform:scale(.5);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+
+/* CONFETTI */
+.confetti{
+  position:fixed;
+  width:8px;
+  height:14px;
+  background:red;
+  top:-20px;
+  animation:fall linear forwards;
+}
+
+@keyframes fall{
+  to{
+    transform:translateY(110vh) rotate(360deg);
+  }
+}
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.game-card{
+  background:#3a0b0b;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  border-radius:8px;
+}
+
+.game-image{
+  width:100%;
+  height:70px;
+  object-fit:cover;
+  margin-bottom:6px;
+  border-radius:4px;
+}
+
+.game-name{
+  font-size:12px;
+  text-align:center;
+  margin-bottom:6px;
+}
+
+.play-btn{
+  background:#c91818;
+  color:#fff;
+  text-decoration:none;
+  height:24px;
+  font-size:12px;
+  font-weight:bold;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:4px;
+}
+</style>
+</head>
+
+<body>
+  <div id="depositPopup" style="
+position:fixed;inset:0;
+background:rgba(0,0,0,.85);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:9999">
+  <div class="popup-box">
+    <h2>⏳ Deposit Diproses</h2>
+    <p>
+      Deposit anda sedang<br>
+      dalam proses verifikasi
+    </p>
+    <button onclick="
+      depositPopup.style.display='none';
+      backHome();
+    ">OK</button>
+  </div>
+</div>
+<div id="jackpotOverlay">
+  <div class="jackpot-popup">
+    <h2>🎉 JACKPOT MEMBER BARU 🎉</h2>
+    <p>Selamat! Anda mendapatkan</p>
+    <h2>IDR 300.000</h2>
+    <p>Silahkan deposit sebesar 100K</p>
+    <button class="btn" onclick="tutupJackpot()">OK</button>
+  </div>
+</div>
+<div class="header">
+  <strong>️🌶CABE slot</strong>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<!-- LOGIN -->
+<div class="page active" id="login">
+  <input id="loginUser" placeholder="Username">
+  <input id="loginPass" type="password" placeholder="Password">
+  <button class="btn" onclick="login()">Login</button>
+  <button class="btn" onclick="showPage('register')">Daftar</button>
+</div>
+
+<!-- REGISTER -->
+<div class="page" id="register">
+  <input id="rUser" placeholder="Username">
+  <input id="rPass" type="password" placeholder="Password">
+  <input id="rPass2" type="password" placeholder="Konfirmasi Password">
+  <input id="rEmail" placeholder="Email">
+  <input id="rPhone" placeholder="No HP">
+  <select id="rBank">
+    <option>BCA</option><option>BRI</option>
+    <option>BNI</option><option>MANDIRI</option>
+  </select>
+  <input id="rRekName" placeholder="Nama Rekening">
+  <input id="rRekNo" placeholder="Nomor Rekening">
+  <button class="btn" onclick="register()">Daftar</button>
+</div>
+
+<!-- HOME -->
+<div class="page" id="home">
+  <div class="home-top">
+    <strong id="homeUser"></strong>
+    <div class="balance">Saldo: IDR <span id="saldo">0</span></div>
+  </div>
+  <div class="jackpot-box">
+  <div class="jackpot-title">JACKPOT PROGRESIF</div>
+  <div class="jackpot-amount">
+    IDR <span id="jackpot"></span>
+  </div>
+</div>
+<div class="menu-kategori">
+  <div class="menu-item" data-link="https://mawartoto.com/semua">
+    <span>☰</span>SEMUA
+  </div>
+  <div class="menu-item" data-link="https://www.games.co.id/permainan/game_kasino">
+    <span>➕</span>CASINO
+  </div>
+  <div class="menu-item" data-link="https://hongkongfunlotto.net/">
+    <span>🎲</span>TOGEL
+  </div>
+  <div class="menu-item" onclick="openSlot()">
+    <span>🍒</span>SLOT
+  </div>
+
+  <div class="menu-item" data-link="https://game.yukmainlottery.com/games/dice_geisha/?session=698b0c6a61935c424c19e6239f11b604349703fcfdebfed60729f98b055914150c86a0820b85a05408cdce0ecf584e5b5cd7e2a171742f774accafd18ca3748a739668e82906bcee80768005782b8da2a6261a942af33071e8c08bc0c17cf5647f59b66877038c214757005d1e30fe6d0348c2ed8fccaf8a364aa7387808b29f77e0a6daee88f54d2e632b7cc2cd52bc">
+    <span>🎱</span>E-LOTTERY
+  </div>
+  <div class="menu-item" data-link="https://sicbodice.pl4yf0rfun4rcd.xyz/">
+    <span>🕹️</span>ARCADE
+  </div>
+  <div class="menu-item" data-link="https://multiplayerlobby2.lobbyroom88.com/pinvalidation/create">
+    <span>🃏</span>POKER
+  </div>
+  <div class="menu-item" data-link="https://lobbybalancing.mngtto.com/m">
+    <span>⭐</span>NEW
+  </div>
+</div>
+<!-- GAMBAR PROMO BAWAH MENU -->
+<div class="promo-img">
+  <img src="https://images.bukaolshop.com/hosting/179599/ee62937df5a1243128.png" 
+       alt="Promo Banner" />
+</div>
+</div>
+<!-- SLOT -->
+<div class="page" id="slot">
+  <div style="background:#4b0d0d;padding:15px;text-align:center;margin-bottom:12px">
+    <h2>🍒 SLOT TERPOPULER</h2>
+  </div>
+
+  <div class="games-grid" id="slotGames"></div>
+</div>
+
+<!-- PROFIL -->
+<div class="page" id="profil">
+  <div class="home-top">
+    <strong>Profil Member</strong>
+    <div class="balance">Saldo: IDR <span id="pSaldo">0</span></div>
+  </div>
+
+  <!-- KARTU PROFIL PREMIUM -->
+  <div class="profile-card">
+    <div class="pc-header">
+      <strong>MAWARTOTO VIP</strong>
+      <div class="badge">PREMIUM</div>
+    </div>
+
+    <div class="pc-item">
+      <span>Username</span>
+      <b id="cardUser">-</b>
+    </div>
+    <div class="pc-item">
+      <span>Email</span>
+      <b id="cardEmail">-</b>
+    </div>
+    <div class="pc-item">
+      <span>No HP</span>
+      <b id="cardPhone">-</b>
+    </div>
+    <div class="pc-item">
+      <span>Bank</span>
+      <b id="cardBank">-</b>
+    </div>
+    <div class="pc-item">
+      <span>Rekening</span>
+      <b id="cardRek">-</b>
+    </div>
+  </div>
+
+  <!-- FORM EDIT PROFIL -->
+  <input id="pUser" readonly>
+  <input id="pEmail" placeholder="Email">
+  <input id="pPhone" placeholder="No HP">
+  <select id="pBank">
+    <option>BCA</option>
+    <option>BRI</option>
+    <option>BNI</option>
+    <option>MANDIRI</option>
+  </select>
+  <input id="pRekName" placeholder="Nama Rekening">
+  <input id="pRekNo" placeholder="Nomor Rekening">
+
+  <button class="btn" onclick="saveProfil()">Simpan Profil</button>
+</div>
+</div>
+
+<!-- DEPOSIT BARU -->
+<div class="page" id="deposit">
+  <div class="home-top"><strong>Deposit</strong></div>
+
+  <input id="depNominal" type="number" placeholder="Minimal 10.000" oninput="hitungDeposit()">
+
+  <div class="banner">
+    Total Transfer<br>
+    <strong>IDR <span id="depTotal">0</span></strong>
+    <div style="font-size:12px;color:#ccc;margin-top:4px">
+      (Termasuk kode unik)
+    </div>
+  </div>
+<div class="banner">
+    <img 
+      src="https://i.supaimg.com/2a108efc-acae-46e2-b3d2-089c53157911.jpg"
+      width="200"
+    >
+    <p>Scan QR untuk melakukan pembayaran</p>
+  </div>
+
+  <input type="file" id="depBukti" accept="image/*">
+
+  <button class="btn" onclick="kirimDeposit()">Kirim Deposit</button>
+</div>
+
+<!-- WITHDRAW -->
+<div class="page" id="withdraw">
+  <div class="home-top"><strong>Withdraw</strong></div>
+
+  <input id="wdNominal" type="number" placeholder="Minimal 50.000">
+  <button class="btn" onclick="prosesWithdraw()">Kirim Withdraw</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button onclick="openDeposit()"><span>💰</span>Deposit</button>
+  <button onclick="openWithdraw()"><span>💸</span>Withdraw</button>
+  <button onclick="openProfil()"><span>👤</span>Profil</button>
+  <button onclick="backHome()"><span>🏠</span>Home</button>
+</div>
+
+<script>
+let kodeUnik=0;
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function register(){
+  let users=JSON.parse(localStorage.getItem('users'))||[];
+  if(rPass.value!==rPass2.value)return alert("Password tidak sama");
+
+  let u={
+    username:rUser.value,
+    pass:rPass.value,
+    email:rEmail.value,
+    phone:rPhone.value,
+    bank:rBank.value,
+    rekName:rRekName.value,
+    rekNo:rRekNo.value,
+    saldo:300000, // BONUS JACKPOT
+    bonus:true
+  };
+
+  users.push(u);
+  localStorage.setItem('users',JSON.stringify(users));
+  localStorage.setItem('loginUser',u.username);
+
+  showHome();
+  setTimeout(showJackpotBonus,600);
+}
+
+function login(){
+  let users=JSON.parse(localStorage.getItem('users'))||[];
+  let u=users.find(x=>x.username===loginUser.value&&x.pass===loginPass.value);
+  if(!u)return alert("Login gagal");
+  localStorage.setItem('loginUser',u.username);
+  showHome();
+}
+
+function showHome(){
+  let u=localStorage.getItem('loginUser');
+  let users=JSON.parse(localStorage.getItem('users'));
+  let user=users.find(x=>x.username===u);
+  homeUser.innerText=u;
+  saldo.innerText=user.saldo;
+  document.querySelector('.bottom-nav').classList.add('show');
+  showPage('home');
+}
+function showHome(){
+  let u=localStorage.getItem('loginUser');
+  let users=JSON.parse(localStorage.getItem('users'));
+  let user=users.find(x=>x.username===u);
+
+  homeUser.innerText=u;
+  saldo.innerText=formatRupiah(user.saldo);
+
+  document.querySelector('.bottom-nav').classList.add('show');
+  showPage('home');
+
+  if(user.bonus){
+    delete user.bonus;
+    localStorage.setItem('users',JSON.stringify(users));
+    setTimeout(showJackpotBonus,600);
+  }
+}
+function openProfil(){
+  let u=localStorage.getItem('loginUser');
+  let users=JSON.parse(localStorage.getItem('users'));
+  let user=users.find(x=>x.username===u);
+
+  // FORM
+  pUser.value=user.username;
+  pEmail.value=user.email;
+  pPhone.value=user.phone;
+  pBank.value=user.bank;
+  pRekName.value=user.rekName;
+  pRekNo.value=user.rekNo;
+  pSaldo.innerText=user.saldo;
+
+  // KARTU
+  cardUser.innerText=user.username;
+  cardEmail.innerText=user.email || "-";
+  cardPhone.innerText=user.phone || "-";
+  cardBank.innerText=user.bank;
+  cardRek.innerText=user.rekName+" • "+user.rekNo;
+
+  showPage('profil');
+}
+kodeUnik = 0;
+function openDeposit(){
+  showPage('deposit');
+  depNominal.value = "";
+  depTotal.innerText = "0";
+}
+
+function hitungDeposit(){
+  let n = parseInt(depNominal.value);
+  if(!n || n < 10000){
+    depTotal.innerText = "0";
+    return;
+  }
+  kodeUnik = Math.floor(Math.random()*900)+100;
+  let total = n + kodeUnik;
+  depTotal.innerText = total.toLocaleString("id-ID");
+}
+
+function kirimDeposit(){
+  if(depNominal.value < 10000)
+    return alert("Minimal deposit 10.000");
+
+  if(!depBukti.files.length)
+    return alert("Upload bukti transfer");
+
+  document.getElementById("depositPopup").style.display="flex";
+}
+
+function backHome(){showHome()}
+function logout(){localStorage.clear();location.reload()}
+if(localStorage.getItem('loginUser'))showHome();
+
+let jackpotValue = 2714885264.25;
+
+function formatIDR(num){
+  return num.toLocaleString("id-ID",{
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+}
+
+function startJackpot(){
+  setInterval(()=>{
+    // naik random
+    jackpotValue += Math.random()*5000;
+    document.getElementById("jackpot").innerText = formatIDR(jackpotValue);
+  }, 100);
+}
+
+startJackpot();
+
+function openWithdraw(){
+  showPage('withdraw');
+}
+
+function prosesWithdraw(){
+  let nominal = parseInt(wdNominal.value);
+  if(nominal < 50000) return alert("Minimal withdraw 50.000");
+
+  let u = localStorage.getItem('loginUser');
+  let users = JSON.parse(localStorage.getItem('users'));
+  let i = users.findIndex(x=>x.username===u);
+
+  if(users[i].saldo < nominal)
+    return alert("Saldo tidak mencukupi");
+
+  users[i].saldo -= nominal;
+  localStorage.setItem('users', JSON.stringify(users));
+
+  alert("✅ Withdraw sedang diproses");
+  showHome();
+}
+
+document.querySelectorAll('.menu-item').forEach(menu=>{
+  menu.addEventListener('click',()=>{
+    // animasi aktif
+    document.querySelectorAll('.menu-item')
+      .forEach(m=>m.classList.remove('active'));
+    menu.classList.add('active');
+
+    // ambil link
+    let link = menu.getAttribute("data-link");
+
+    if(link){
+      window.open(link, "_blank"); // buka tab baru
+    }
+  });
+});
+function formatRupiah(n){
+  return n.toLocaleString("id-ID",{
+    style:"currency",
+    currency:"IDR",
+    minimumFractionDigits:0
+  });
+}
+
+function showJackpotBonus(){
+  const overlay = document.getElementById("jackpotOverlay");
+  overlay.style.display="flex";
+
+  // confetti
+  for(let i=0;i<120;i++){
+    let c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    c.style.animationDuration=2+Math.random()*3+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),5000);
+  }
+}
+
+function tutupJackpot(){
+  document.getElementById("jackpotOverlay").style.display="none";
+}
+
+function openSlot(){
+  showPage('slot');
+}
+
+/* ===== DATA 50 GAME SLOT ===== */
+const slotGamesData = [
+  {name:"Fortune Tiger",img:"https://i.supaimg.com/1f671172-ab4b-4266-b096-180f53314d9d.webp",link:"https://nagaimam.xyz/pgsoft/fortunetiger"},
+  {name:"Lucky Neko",img:"https://i.supaimg.com/2e9aeb1d-3cf0-4c31-9824-784dfc75dcf9.jpg",link:"https://nagaimam.xyz/pgsoft/luckyneko"},
+  {name:"Wild Bandito",img:"https://i.supaimg.com/29795688-a531-47a2-97f0-518d8601ec9a.jpg",link:"https://nagaimam.xyz/pgsoft/wildbandito"},
+  {name:"Mahjong Ways",img:"https://images.bukaolshop.com/hosting/179599/01ef3bc313e9135780.png",link:"https://nagaimam.xyz/pgsoft/mahjongways"},
+  {name:"Mahjong Ways 2",img:"https://images.bukaolshop.com/hosting/179599/cbee98de724b22431.png",link:"https://nagaimam.xyz/pgsoft/mahjongways2"},
+  {name:"Wild Bounty",img:"https://i.supaimg.com/f00a4252-ac2f-4a4d-ba4c-6b68abe61210.jpg",link:"https://nagaimam.xyz/pgsoft/wildbountyshowdown"},
+  {name:"Fortune Tiger",img:"https://i.supaimg.com/23eecfc4-8850-4f4c-b10b-aeff4a905eae.jpg",link:"https://nagaimam.xyz/pgsoft/fortunetiger"},
+  {name:"Fortune Ox",img:"https://i.supaimg.com/0427a655-1d01-48e3-80e2-ce85919af7c0.jpg",link:"https://nagaimam.xyz/pgsoft/fortuneox"},
+  {name:"Fortune Mouse",img:"https://i.supaimg.com/45c0d021-e303-47df-bb28-caecd61793ca.jpg",link:"https://nagaimam.xyz/pgsoft/fortunemouse"},
+  {name:"Poker Kingdome",img:"https://i.supaimg.com/b8524549-32a0-4a41-a453-29c772a4c78a.jpg",link:"https://nagaimam.xyz/pgsoft/pokerkingdomwin"},
+
+  {name:"Pharaoh Royal",img:"https://i.supaimg.com/74957e58-e73f-4dc7-9b8e-257f6a6741fb.jpg",link:"https://nagaimam.xyz/pgsoft/pharaohroyals"},
+  {name:"Skyligh Wonders",img:"https://images.bukaolshop.com/hosting/179599/d61208835084148271.png",link:"https://nagaimam.xyz/pgsoft/skylightwonders"},
+  {name:"Alibaba Fortune",img:"https://images.bukaolshop.com/hosting/179599/3cbde1f1c96b271813.png",link:"https://nagaimam.xyz/pgsoft/alibabascaveoffortune"},
+  {name:"Chocolate delux",img:"https://i.supaimg.com/9aec98db-e165-46ec-9370-1ca1eac54f67.jpg",link:"https://nagaimam.xyz/pgsoft/chocolatedeluxe"},
+  {name:"Mafia Jor",img:"https://i.supaimg.com/bfb58427-027d-439c-978a-c346483afd56.jpg",link:"https://nagaimam.xyz/pgsoft/mafiamayhem"},
+  {name:"Coktail Nigh",img:"https://i.supaimg.com/e3dee07a-a3d6-4a1c-9576-6a02b90e1ff6.jpg",link:"https://nagaimam.xyz/pgsoft/cocktailnights"},
+  {name:"Aztec",img:"https://i.supaimg.com/0acf2291-dbec-4dfc-a09e-f47d7c790985.jpg",link:"https://nagaimam.xyz/pgsoft/treasuresofaztec"},
+  {name:"Thegreat escape",img:"https://i.supaimg.com/b7c6e29a-e5f7-43ca-abcf-9a454bc9fd62.jpg",link:"https://nagaimam.xyz/pgsoft/thegreaticescape"},
+   {name:"Dragon Hact",img:"https://i.supaimg.com/4926f665-ad90-47a4-8885-881949abe415.jpg",link:"https://nagaimam.xyz/pgsoft/dragonhatch"},
+   {name:"Caisen Wins",img:"https://i.supaimg.com/2da6c3c2-d518-4c25-b99b-1bc76ff9e520.jpg",link:"https://nagaimam.xyz/pgsoft/caishenwins"},
+  {name:"Speed Winer",img:"https://i.supaimg.com/29148c2e-da23-4439-85dd-a6ada4a6fe98.jpg",link:"https://nagaimam.xyz/pgsoft/speedwinner"},
+  {name:"Pinata Wins",img:"https://i.supaimg.com/c9b44104-7a34-42e7-b4f7-b1c45864d8ac.jpg",link:"https://nagaimam.xyz/pgsoft/pinatawins"},
+  {name:"Wild Ape",img:"https://i.supaimg.com/8060d5c6-69b3-42fe-8f0d-352a9cb35ace.jpg",link:"https://nagaimam.xyz/pgsoft/wildape"},
+  {name:"Ways Of Theqilin",img:"https://i.supaimg.com/d2269ceb-5c90-4089-99fd-bd776be9727f.jpg",link:"https://nagaimam.xyz/pgsoft/waysoftheqilin"},
+  {name:"Pinata Wins",img:"https://i.supaimg.com/c9b44104-7a34-42e7-b4f7-b1c45864d8ac.jpg",link:"https://nagaimam.xyz/pgsoft/pinatawins"},
+  {name:"Wild Ape",img:"https://i.supaimg.com/8060d5c6-69b3-42fe-8f0d-352a9cb35ace.jpg",link:"https://nagaimam.xyz/pgsoft/wildape"},
+  {name:"Ways Of Theqilin",img:"https://i.supaimg.com/d2269ceb-5c90-4089-99fd-bd776be9727f.jpg",link:"https://nagaimam.xyz/pgsoft/waysoftheqilin"},
+  /* TOTAL 50 (lanjutkan copy jika mau tambah) */
+];
+
+/* RENDER */
+const slotBox = document.getElementById("slotGames");
+slotGamesData.forEach(g=>{
+  slotBox.innerHTML += `
+    <div class="game-card">
+      <img src="${g.img}" class="game-image">
+      <div class="game-name">${g.name}</div>
+      <a href="${g.link}" target="_blank" class="play-btn">MAIN</a>
+    </div>
+  `;
+});
+</script>
+
+</body>
+</html>
